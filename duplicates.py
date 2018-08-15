@@ -1,11 +1,12 @@
 import os
 import argparse
+import re
 
 
-def get_all_files(path):
-    file_list = []
+def get_files(path):
+    files_list = []
     for root, dirs, files in os.walk(path):
-        file_list += [
+        files_list += [
             {
                 "name": filename,
                 "path": os.path.join(root, filename),
@@ -13,42 +14,47 @@ def get_all_files(path):
                 }
             for filename in files
             ]
-    return file_list
+    return files_list
 
 
-def get_dublicates_set(file_list):
-    dubl_dict = {}
-    for file_info in file_list:
-        name = file_info["name"]
-        if name not in dubl_dict:
-            size = file_info["size"]
-            dublicates = [
-                i
-                for i in file_list
-                if i["name"] == name and
-                i["size"] == size
+def get_dublicates(files_list):
+    dublicates_dict = {}
+    for file in files_list:
+        name = file["name"]
+        if name not in dublicates_dict:
+            size = file["size"]
+            similar_files = [
+                f
+                for f in files_list
+                if f["name"] == name and
+                f["size"] == size
                 ]
-            if len(dublicates) > 1:
-                dubl_dict[name] = dublicates
-    return dubl_dict
+            if len(similar_files) > 1:
+                dublicates_dict[name] = similar_files
+    return dublicates_dict
 
 
-def print_dublicates(dublicates_container):
-    for name, dublicates in dublicates_container.items():
+def print_dublicates(dublicates):
+    for name, files in dublicates.items():
         print(f"\n {name}:\n")
-        for i in [x["path"] for x in dublicates]:
-            print("\t", i)
+        for path in [file["path"] for file in files]:
+            print("\t", path)
+
+
+def get_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", default=".", dest="path")
+    args = parser.parse_args()
+    return args.path
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-p", action="store", dest="path")
-    args = parser.parse_args()
-    path = args.path if args.path else "."
-    file_list = get_all_files(path)
-    dublicates_set = get_dublicates_set(file_list)
-    print_dublicates(dublicates_set)
+    path = get_arguments()
+    founded_files = get_files(r'{}'.format(path))
+    dublicates = get_dublicates(founded_files)
+    print_dublicates(dublicates)
 
 
 if __name__ == "__main__":
     main()
+
