@@ -1,6 +1,5 @@
 import os
 import argparse
-import re
 
 
 def get_files(path):
