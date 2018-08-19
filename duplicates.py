@@ -2,45 +2,48 @@ import os
 import argparse
 
 
-def get_files(path):
-    files_list = []
+def get_files_attributes(path):
+    files_attrs_list = []
     for root, dirs, files in os.walk(path):
-        files_list += [
+        files_attrs_list += [
             {
                 "name": filename,
                 "path": os.path.join(root, filename),
                 "size": os.path.getsize(os.path.join(root, filename))
-                }
-            for filename in files
+            } for filename in files
+        ]
+    return files_attrs_list
+
+
+def get_dublicates_attributes(files_attributes_list):
+    dublicates_attrs_dict = {}
+    for file_attrs in files_attributes_list:
+        filename = file_attrs["name"]
+        if filename not in dublicates_attrs_dict:
+            size = file_attrs["size"]
+            similar_files_attributes = [
+                file_attrs
+                for file_attrs in files_attributes_list
+                if file_attrs["name"] == filename
+                and file_attrs["size"] == size
             ]
-    return files_list
+            if len(similar_files_attributes) > 1:
+                dublicates_attrs_dict[filename] = similar_files_attributes
+    return dublicates_attrs_dict
 
 
-def get_dublicates(files_list):
-    dublicates_dict = {}
-    for file in files_list:
-        filename = file["name"]
-        if filename not in dublicates_dict:
-            size = file["size"]
-            similar_files = [
-                dublicate
-                for dublicate in files_list
-                if dublicate["name"] == filename and
-                dublicate["size"] == size
-                ]
-            if len(similar_files) > 1:
-                dublicates_dict[name] = similar_files
-    return dublicates_dict
+def print_dublicates_attributes(dublicates_attributes_dict):
+    for filename_key, files_atributes in dublicates_attributes_dict.items():
+        print("\n {}:\n".format(filename_key))
+        paths = [
+            file_attributes["path"]
+            for file_attributes in files_atributes
+        ]
+        for file_path in paths:
+            print("\t", file_path)
 
 
-def print_dublicates(dublicates):
-    for filename, files in dublicates.items():
-        print("\n {}:\n".format(name))
-        for path in [file["path"] for file in files]:
-            print("\t", path)
-
-
-def get_arguments():
+def get_path_from_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", default=".", dest="path")
     args = parser.parse_args()
@@ -48,12 +51,11 @@ def get_arguments():
 
 
 def main():
-    path = get_arguments()
-    founded_files = get_files(r"{}".format(path))
-    dublicates = get_dublicates(founded_files)
-    print_dublicates(dublicates)
+    path = get_path_from_args()
+    founded_files_attributes = get_files_attributes(r"{}".format(path))
+    dublicates_attributes = get_dublicates_attributes(founded_files_attributes)
+    print_dublicates_attributes(dublicates_attributes)
 
 
 if __name__ == "__main__":
     main()
-
