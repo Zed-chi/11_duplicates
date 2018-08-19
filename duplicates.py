@@ -1,60 +1,46 @@
 import os
 import argparse
+from collections import defaultdict
 
 
-def get_files_attributes(path):
-    files_attrs_list = []
+def get_files_paths(path):
+    files_paths = defaultdict(list)
     for root, dirs, files in os.walk(path):
-        files_attrs_list += [
-            {
-                "name": filename,
-                "path": os.path.join(root, filename),
-                "size": os.path.getsize(os.path.join(root, filename))
-            } for filename in files
-        ]
-    return files_attrs_list
+        for filename in files:
+            size = os.path.getsize(os.path.join(root, filename))
+            path = os.path.join(root, filename)
+            files_paths[(filename, size)] += [path, ]
+
+    return files_paths
 
 
-def get_dublicates_attributes(files_attributes_list):
-    dublicates_attrs_dict = {}
-    for file_attrs in files_attributes_list:
-        filename = file_attrs["name"]
-        if filename not in dublicates_attrs_dict:
-            size = file_attrs["size"]
-            similar_files_attributes = [
-                file_attrs
-                for file_attrs in files_attributes_list
-                if file_attrs["name"] == filename
-                and file_attrs["size"] == size
-            ]
-            if len(similar_files_attributes) > 1:
-                dublicates_attrs_dict[filename] = similar_files_attributes
-    return dublicates_attrs_dict
+def get_duplicates_paths(files_paths):
+    duplicates_paths = {}
+    for identificator, paths in files_paths.items():
+        if len(paths) > 1:
+            duplicates_paths[identificator] = paths
+    return duplicates_paths
 
 
-def print_dublicates_attributes(dublicates_attributes_dict):
-    for filename_key, files_atributes in dublicates_attributes_dict.items():
-        print("\n {}:\n".format(filename_key))
-        paths = [
-            file_attributes["path"]
-            for file_attributes in files_atributes
-        ]
+def print_duplicates_paths(duplicates_paths):
+    for (filename, size), paths in duplicates_paths.items():
+        print("\n {} - {} bytes:\n".format(filename, size))
         for file_path in paths:
             print("\t", file_path)
 
 
-def get_path_from_args():
+def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", default=".", dest="path")
     args = parser.parse_args()
-    return args.path
+    return args
 
 
 def main():
-    path = get_path_from_args()
-    founded_files_attributes = get_files_attributes(r"{}".format(path))
-    dublicates_attributes = get_dublicates_attributes(founded_files_attributes)
-    print_dublicates_attributes(dublicates_attributes)
+    path = get_args().path
+    founded_files_paths = get_files_paths(path)
+    duplicates_paths = get_duplicates_paths(founded_files_paths)
+    print_duplicates_paths(duplicates_paths)
 
 
 if __name__ == "__main__":
