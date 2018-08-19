@@ -1,9 +1,9 @@
 # Anti-Duplicator
 
-Prints duplicate files in provided path
+Prints duplicate files in provided path 
 ## Usage
 
-`python duplicate.py -p <some_directory>`
+`python duplicate.py -p <some_directory> (default path is "." script path)`
 
 Example in Windows:
 
