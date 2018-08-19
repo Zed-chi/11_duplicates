@@ -23,10 +23,10 @@ def get_dublicates(files_list):
         if name not in dublicates_dict:
             size = file["size"]
             similar_files = [
-                f
-                for f in files_list
-                if f["name"] == name and
-                f["size"] == size
+                dublicate
+                for dublicate in files_list
+                if dublicate["name"] == name and
+                dublicate["size"] == size
                 ]
             if len(similar_files) > 1:
                 dublicates_dict[name] = similar_files
@@ -35,7 +35,7 @@ def get_dublicates(files_list):
 
 def print_dublicates(dublicates):
     for name, files in dublicates.items():
-        print(f"\n {name}:\n")
+        print("\n {}:\n".format(name))
         for path in [file["path"] for file in files]:
             print("\t", path)
 
@@ -49,7 +49,7 @@ def get_arguments():
 
 def main():
     path = get_arguments()
-    founded_files = get_files(r'{}'.format(path))
+    founded_files = get_files(r"{}".format(path))
     dublicates = get_dublicates(founded_files)
     print_dublicates(dublicates)
 
