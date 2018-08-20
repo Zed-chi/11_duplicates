@@ -5,12 +5,11 @@ from collections import defaultdict
 
 def get_files_paths(path):
     files_paths = defaultdict(list)
-    for root, dirs, files in os.walk(path):
-        for filename in files:
-            size = os.path.getsize(os.path.join(root, filename))
-            path = os.path.join(root, filename)
-            files_paths[(filename, size)] += [path, ]
-
+    for dirpath, dirnames, filenames in os.walk(path):
+        for filename in filenames:
+            size = os.path.getsize(os.path.join(dirpath, filename))
+            path = os.path.join(dirpath, filename)
+            files_paths[(filename, size)].append(path)
     return files_paths
 
 
