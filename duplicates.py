@@ -24,8 +24,7 @@ def get_duplicates_paths(files_paths):
 def print_duplicates_paths(duplicates_paths):
     for (filename, size), paths in duplicates_paths.items():
         print("\n {} - {} bytes:\n".format(filename, size))
-        for file_path in paths:
-            print("\t", file_path)
+        print("\n\t".join(paths))
 
 
 def get_args():
